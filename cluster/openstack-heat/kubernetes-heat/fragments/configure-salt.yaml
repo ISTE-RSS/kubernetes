@@ -17,7 +17,6 @@ write_files:
         network_mode: openvswitch
         networkInterfaceName: eth0
         api_servers: $MASTER_IP
-        kubelet_kubeconfig: /srv/salt-overlay/salt/kubelet/kubeconfig
         cloud: openstack
         cloud_config: /srv/kubernetes/openstack.conf
         roles:
@@ -40,6 +39,7 @@ write_files:
       lb-version=$LBAAS_VERSION
       subnet-id=$SUBNET_ID
       floating-network-id=$FLOATING_NETWORK_ID
+      manage-security-groups=False
       [Route]
       router-id=$router_id
   - path: /srv/salt-overlay/pillar/cluster-params.sls
@@ -60,7 +60,7 @@ write_files:
       instance_prefix: kubernetes
       admission_control: Initializers,NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota
       enable_cpu_cfs_quota: "true"
-      network_provider: none
+      network_provider: "kubenet"
       cluster_cidr: "$cluster_cidr"
       opencontrail_tag: R2.20
       opencontrail_kubernetes_tag: master

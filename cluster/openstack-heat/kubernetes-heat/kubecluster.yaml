@@ -1,4 +1,4 @@
-heat_template_version: 2016-10-14
+heat_template_version: 2015-10-15
 
 description: >
   Kubernetes cluster with one master and one or more worker nodes
@@ -366,6 +366,9 @@ resources:
     depends_on:
       - extrouter_inside
     properties:
+      config_drive: true
+      metadata:
+        group: kube-master
       image: {get_param: server_image}
       flavor: {get_param: master_flavor}
       key_name: {get_param: ssh_key_name}
@@ -424,7 +427,7 @@ resources:
           kube_master_ip: {get_attr: [kube_master_eth0, fixed_ips, 0, ip_address]}
           external_network: {get_param: external_network}
           wait_condition_timeout: {get_param: wait_condition_timeout}
-          metadata: {"metering.stack": {get_param: "OS::stack_id"}}
+          metadata: {"metering.stack": {get_param: "OS::stack_id"},"group":"kube-node"}
           cluster_name: {get_param: "OS::stack_name"}
           secgroup_base: {get_resource: secgroup_base}
           secgroup_node: {get_resource: secgroup_node}

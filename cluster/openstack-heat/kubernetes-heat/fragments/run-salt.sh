@@ -50,4 +50,4 @@ echo "+++ run salt-call and finalize installation"
 # See <https://github.com/projectatomic/docker-storage-setup/issues/77>.
 # Run salt-call in background and make cloud-final finished.
 # Salt-call might be unstable in some environments, execute it twice.
-salt-call --local state.highstate && salt-call --local state.highstate && $$wc_notify --data-binary '{"status": "SUCCESS"}' || $$wc_notify --data-binary '{"status": "FAILURE"}' &
+salt-call --local state.highstate && $$wc_notify --data-binary '{"status": "SUCCESS"}' || $$wc_notify --data-binary '{"status": "FAILURE"}' &

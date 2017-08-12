@@ -1,4 +1,4 @@
-heat_template_version: 2016-10-14
+heat_template_version: 2015-10-15
 
 description: >
   This is a nested stack that defines a single Kubernetes minion, This stack is
@@ -131,9 +131,6 @@ parameters:
     type: string
   secgroup_node:
     type: string
-
-conditions:
-  assign_floating_ip: {equals : [{get_param: assign_floating_ip}, true]}
 
 resources:
 
@@ -273,6 +270,7 @@ resources:
   kube_minion:
     type: OS::Nova::Server
     properties:
+      config_drive: true
       image: {get_param: server_image}
       flavor: {get_param: minion_flavor}
       key_name: {get_param: ssh_key_name}
@@ -283,6 +281,20 @@ resources:
         - port: {get_resource: kube_minion_eth0}
       name:
         list_join: [-, [{get_param: cluster_name}, node, {get_resource: server_name_post_fix}]]
+  
+  cinder_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 20
+      name: 
+        list_join: [-, [{get_param: cluster_name}, gfs-volume, {get_resource: server_name_post_fix}]]
+        
+  volume_attachment:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      volume_id: { get_resource: cinder_volume }
+      instance_uuid: { get_resource: kube_minion }
+      mountpoint: /dev/vdb
 
   kube_minion_eth0:
     type: OS::Neutron::Port
@@ -302,7 +314,6 @@ resources:
     properties:
       floating_network: {get_param: external_network}
       port_id: {get_resource: kube_minion_eth0}
-    condition: assign_floating_ip
 
 outputs:
 
@@ -311,4 +322,3 @@ outputs:
 
   kube_minion_external_ip:
     value: {get_attr: [kube_minion_floating, floating_ip_address]}
-    condition: assign_floating_ip

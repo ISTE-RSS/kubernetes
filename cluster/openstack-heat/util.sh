@@ -251,7 +251,9 @@ function configure-kubectl() {
 
   export KUBE_MASTER_IP=$(nova show "${STACK_NAME}"-master | awk '$3=="network" {print $6}')
   export CONTEXT="openstack-${STACK_NAME}"
-  export KUBE_BEARER_TOKEN="TokenKubelet"
+  export CA_CERT="/Users/snowball/openstack_kubernetes/pki/ca.crt"
+  export KUBE_CERT="/Users/snowball/openstack_kubernetes/pki/admin.crt"
+  export KUBE_KEY="/Users/snowball/openstack_kubernetes/pki/admin.key"
 
   if [[ "${ENABLE_PROXY:-}" == "true" ]]; then
     echo 'export NO_PROXY=$NO_PROXY,'"${KUBE_MASTER_IP}" > /tmp/kube-proxy-env
