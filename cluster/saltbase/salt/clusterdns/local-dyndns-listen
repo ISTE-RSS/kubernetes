@@ -1,0 +1,18 @@
+#!/bin/bash
+# Accept commands and update /tmp/hosts
+#
+# Copyright (C) James Budiono 2013
+# License: GPL Version 3 or later.
+
+PASS=woofwoof            # password for connecting
+HOSTDIR=/tmp/hosts       # location of dynamic host files
+[ -e /etc/local-dyndns.conf ] && . /etc/local-dyndns.conf
+
+read action pass hostname ip
+[ $pass != $PASS ] && exit
+
+case $action in
+	add) echo $ip $hostname > /tmp/hosts/$hostname ;;
+	del) rm /tmp/hosts/$hostname ;;
+esac
+kill -HUP $1 # reload dnsmasq config

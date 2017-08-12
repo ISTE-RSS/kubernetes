@@ -1,0 +1,15 @@
+[Unit]
+Description=DynDns
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/usr/bin
+ExecStart=/usr/bin/dyndns-server.sh start
+ExecStop=/usr/bin/dyndns-server.sh stop
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

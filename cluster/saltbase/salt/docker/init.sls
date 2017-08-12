@@ -18,12 +18,23 @@ bridge-utils:
     - mode: 644
     - makedirs: true
 
+/etc/docker/daemon.json:
+  file.managed:
+    - source: salt://docker/daemon.json
+    - user: root
+    - group: root
+    - mode: 644
+    - makedirs: true
+    - require_in:
+      - service: docker
+      
 {% if grains.cloud is defined and grains.cloud == 'openstack' %}
 
 cbr0:
   # workaround https://github.com/saltstack/salt/issues/20570
   kmod.present:
     - name: bridge
+    - name: br_netfilter
 
   network.managed:
     - enabled: True

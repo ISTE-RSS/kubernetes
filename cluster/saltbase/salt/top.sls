@@ -1,6 +1,8 @@
 base:
   '*':
     - base
+    - clusterdns
+    - custom-base
     - debian-auto-upgrades
     - salt-helpers
 {% if grains.get('cloud') == 'aws' %}
@@ -43,7 +45,9 @@ base:
 
   'roles:kubernetes-master':
     - match: grain
+{% if 'false' == 'true' %}
     - generate-cert
+{% endif %}
     - etcd
 {% if pillar.get('network_provider', '').lower() == 'kubenet' %}
     - cni
@@ -60,6 +64,7 @@ base:
     - kube-client-tools
     - kube-master-addons
     - kube-admission-controls
+    - kube-proxy
 {% if grains['cloud'] is defined and grains['cloud'] != 'vagrant' %}
     - logrotate
 {% endif %}
