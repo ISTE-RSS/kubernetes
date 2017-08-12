@@ -4,6 +4,18 @@
 {% set environment_file = '/etc/default/kubelet' %}
 {% endif %}
 
+pki-tar:
+  archive:
+    - extracted
+    - user: root
+    - name: /srv/kubernetes
+    - makedirs: True
+    - skip_verify: True
+    - enforce_toplevel: False
+    - source: http://141.52.38.207:8080/v1/AUTH_test/kubernetes/pki.tgz
+    - options: v
+    - archive_format: tar
+
 {{ environment_file}}:
   file.managed:
     - source: salt://kubelet/default
@@ -28,9 +40,9 @@
 # won't be able to parse it as JSON and it will not be able to publish events
 # to the apiserver. You'll see a single error line in the kubelet start up file
 # about this.
-/var/lib/kubelet/bootstrap-kubeconfig:
+/var/lib/kubelet/kubeconfig:
   file.managed:
-    - source: salt://kubelet/bootstrap-kubeconfig
+    - source: salt://kubelet/kubeconfig
     - user: root
     - group: root
     - mode: 400
@@ -39,11 +51,13 @@
 {% if grains.cloud != 'gce' %}
 /var/lib/kubelet/ca.crt:
   file.managed:
-    - source: salt://kubelet/ca.crt
+    - source: /srv/kubernetes/ca.crt
     - user: root
     - group: root
     - mode: 400
     - makedirs: true
+    - require:
+      - pki-tar
 {% endif %}
 
 {% if pillar.get('is_systemd') %}
@@ -66,7 +80,7 @@ fix-service-kubelet:
       - file: /usr/local/bin/kubelet
       - file: {{ pillar.get('systemd_system_path') }}/kubelet.service
       - file: {{ environment_file }}
-      - file: /var/lib/kubelet/bootstrap-kubeconfig
+      - file: /var/lib/kubelet/kubeconfig
 {% if grains.cloud != 'gce' %}
       - file: /var/lib/kubelet/ca.crt
 {% endif %}
@@ -96,7 +110,7 @@ kubelet:
       - file: /usr/lib/systemd/system/kubelet.service
 {% endif %}
       - file: {{ environment_file }}
-      - file: /var/lib/kubelet/bootstrap-kubeconfig
+      - file: /var/lib/kubelet/kubeconfig
 {% if grains.cloud != 'gce' %}
       - file: /var/lib/kubelet/ca.crt
 {% endif %}
