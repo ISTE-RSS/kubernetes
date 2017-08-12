@@ -16,7 +16,7 @@
   {% set scheduling_algorithm_provider = "--algorithm-provider=" + grains.scheduling_algorithm_provider -%}
 {% endif -%}
 
-{% set params = params + log_level + " " + feature_gates + " " + scheduling_algorithm_provider -%}
+{% set params = params + " " + log_level + " " + feature_gates + " " + scheduling_algorithm_provider -%}
 
 # test_args has to be kept at the end, so they'll overwrite any prior configuration
 {% if pillar['scheduler_test_args'] is defined -%}

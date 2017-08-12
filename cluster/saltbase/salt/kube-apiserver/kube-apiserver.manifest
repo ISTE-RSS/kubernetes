@@ -87,8 +87,9 @@
 
 {% set cert_file = "--tls-cert-file=/srv/kubernetes/server.cert" -%}
 {% set key_file = "--tls-private-key-file=/srv/kubernetes/server.key" -%}
-{% set kubelet_cert_file = "--kubelet-client-certificate=/srv/kubernetes/kubeapiserver.cert" -%}
-{% set kubelet_key_file = "--kubelet-client-key=/srv/kubernetes/kubeapiserver.key" -%}
+{% set kubelet_cert_file = "--kubelet-certificate-authority=/srv/kubernetes/ca.crt --kubelet-client-certificate=/srv/kubernetes/kubelet.crt" -%}
+{% set kubelet_key_file = "--kubelet-client-key=/srv/kubernetes/kubelet.key" -%}
+
 {% set client_ca_file = "" -%}
 
 {% set secure_port = "6443" -%}
@@ -109,6 +110,7 @@
 {% if grains['cloud'] is defined and grains.cloud in [ 'aws', 'gce', 'vagrant', 'photon-controller', 'openstack']  %}
   {% set token_auth_file = " --token-auth-file=/srv/kubernetes/known_tokens.csv" -%}
   {% set basic_auth_file = " --basic-auth-file=/srv/kubernetes/basic_auth.csv" -%}
+  {% set basic_auth_file = " " -%}
   {% set authz_mode = " --authorization-mode=ABAC" -%}
   {% set abac_policy_file = " --authorization-policy-file=/srv/kubernetes/abac-authz-policy.jsonl" -%}
 {% endif -%}
